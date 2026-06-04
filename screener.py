@@ -19,13 +19,16 @@ import json
 import time
 import math
 import subprocess
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Any, Optional
 
 import pandas as pd
 import numpy as np
 import requests
 import yfinance as yf
+import zipfile
+import io
+import tempfile
 
 # ----------------------- Configuration -----------------------
 # Max results to include in the email (changeable)
@@ -51,6 +54,11 @@ NSE_NIFTY500_CSV = (
 # Allow disabling delivery % check via environment for cases when NSE API is rate-limiting or blocked
 # Set environment variable DELIVERY_CHECK_ENABLED=0 to skip delivery checks and only use SMA support filter
 DELIVERY_CHECK_ENABLED = str(os.environ.get('DELIVERY_CHECK_ENABLED', '1')).lower() in ('1', 'true', 'yes')
+# Use bhavcopy as preferred delivery source when available
+USE_BHAVCOPY = str(os.environ.get('USE_BHAVCOPY', '1')).lower() in ('1', 'true', 'yes')
+BHAVCOPY_DATE = os.environ.get('BHAVCOPY_DATE')  # optional YYYY-MM-DD to pick specific bhavcopy
+NSE_REPORTS_API_URL = 'https://www.nseindia.com/api/daily-reports?key={key}'
+NSE_REPORTS_REFERER = 'https://www.nseindia.com/all-reports'
 
 # ----------------------- Helper Functions -----------------------
 
@@ -198,12 +206,296 @@ def fetch_delivery_percentage_nse(ticker: str) -> Optional[float]:
                         return val
             # nothing found this attempt
         except Exception as e:
-            # transient error, retry
-            # print minimal debug to help CI logs
-            print(f"Warning: delivery fetch attempt {attempt+1} failed for {ticker}: {str(e)[:120]}")
+            error_reason = str(e)[:150]
+            print(f"NSE JSON fetch failed for {ticker} (attempt {attempt+1}): {error_reason}")
             time.sleep(1)
             continue
     return None
+
+
+def download_and_parse_bhavcopy_for_date(date_obj) -> Dict[str, float]:
+    """Download bhavcopy ZIP for given `date_obj` and return symbol->delivery_pct map.
+
+    Expects NSE archives path like:
+      https://archives.nseindia.com/content/historical/EQUITIES/{YYYY}/{MON}/{DDMONYYYYbhav.csv.zip}
+    Returns empty dict on failure.
+    """
+    result = {}
+    try:
+        year = date_obj.strftime('%Y')
+        mon = date_obj.strftime('%b').upper()
+        day_str = date_obj.strftime('%d%b%Y').upper()  # e.g., 04JUN2026
+        url = f"https://archives.nseindia.com/content/historical/EQUITIES/{year}/{mon}/{day_str}bhav.csv.zip"
+        headers = {'User-Agent': 'Mozilla/5.0 (compatible; ScreenerBot/1.0)'}
+        resp = requests.get(url, headers=headers, timeout=20)
+        resp.raise_for_status()
+        with tempfile.TemporaryDirectory() as td:
+            z = zipfile.ZipFile(io.BytesIO(resp.content))
+            # find first CSV inside
+            csv_name = None
+            for name in z.namelist():
+                if name.lower().endswith('.csv'):
+                    csv_name = name
+                    break
+            if csv_name is None:
+                return {}
+            with z.open(csv_name) as fh:
+                # read into pandas
+                df = pd.read_csv(fh)
+                # Normalize column names
+                cols = {c.strip(): c for c in df.columns}
+                # expected columns: SYMBOL, TOTTRDQTY or TTLTRDQTY, DELIV_QTY or DELIVQTY
+                sym_col = None
+                tot_col = None
+                deliv_col = None
+                for c in df.columns:
+                    cl = c.strip().upper()
+                    if cl == 'SYMBOL':
+                        sym_col = c
+                    if cl in ('TOTTRDQTY', 'TTLTRDQTY', 'TOTTRDQTY '):
+                        tot_col = c
+                    if cl in ('DELIV_QTY', 'DELIVQTY', 'DELIV_QTY '):
+                        deliv_col = c
+                if sym_col is None or tot_col is None or deliv_col is None:
+                    # try fuzzy matches
+                    for c in df.columns:
+                        uc = c.strip().upper()
+                        if 'SYMBOL' in uc and sym_col is None:
+                            sym_col = c
+                        if 'TOT' in uc and 'QTY' in uc and tot_col is None:
+                            tot_col = c
+                        if 'DELIV' in uc and 'QTY' in uc and deliv_col is None:
+                            deliv_col = c
+                if sym_col is None or tot_col is None or deliv_col is None:
+                    return {}
+                for _, row in df.iterrows():
+                    try:
+                        sym = str(row[sym_col]).strip().upper()
+                        tot = int(float(row[tot_col])) if not pd.isna(row[tot_col]) else 0
+                        deliv = int(float(row[deliv_col])) if not pd.isna(row[deliv_col]) else 0
+                        if tot > 0:
+                            pct = (deliv / tot) * 100.0
+                            result[sym] = pct
+                    except Exception:
+                        continue
+        return result
+    except Exception as e:
+        print(f"Warning: failed to download/parse bhavcopy for {date_obj.date()}: {str(e)[:120]}")
+        return {}
+
+
+def determine_bhavcopy_date_from_yfinance(tickers: List[str]) -> Optional[str]:
+    """Infer the bhavcopy date from yfinance last-trade date.
+
+    Fetches price data for the first available ticker and returns the
+    most recent trading date in YYYY-MM-DD format.
+    Returns None if no data available.
+    """
+    for t in tickers[:5]:  # try first few tickers
+        df = fetch_price_data(t, period='30d')
+        if df is None or df.empty:
+            continue
+        try:
+            # index is DatetimeIndex; get last (most recent) date
+            last_date = df.index[-1].date().isoformat()
+            return last_date
+        except Exception:
+            continue
+    return None
+
+
+def prepare_nse_reports_session() -> requests.Session:
+    """Prepare a requests session for NSE reports endpoints with cookies and headers."""
+    session = requests.Session()
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': NSE_REPORTS_REFERER,
+    })
+    try:
+        session.get('https://www.nseindia.com', timeout=20)
+        session.get(NSE_REPORTS_REFERER, timeout=20)
+    except Exception:
+        pass
+    return session
+
+
+def fetch_daily_reports_metadata(key: str, session: Optional[requests.Session] = None) -> Dict[str, Any]:
+    """Fetch daily report metadata for a given segment key from NSE reports API."""
+    session = session or prepare_nse_reports_session()
+    try:
+        resp = session.get(NSE_REPORTS_API_URL.format(key=key), timeout=20)
+        resp.raise_for_status()
+        return resp.json() if resp.text else {}
+    except Exception as e:
+        print(f"Warning: failed to fetch daily reports metadata for {key}: {e}")
+        return {}
+
+
+def choose_bhavcopy_report_item(metadata: Dict[str, Any], target_date: datetime) -> Optional[Dict[str, Any]]:
+    """Choose the best bhavcopy report item from daily reports metadata."""
+    if not metadata:
+        return None
+    date_key = target_date.strftime('%d-%b-%Y')
+    candidates = []
+    for item in metadata.get('PreviousDay', []):
+        if item.get('tradingDate') != date_key:
+            continue
+        name = str(item.get('displayName', '')).lower()
+        file_name = str(item.get('fileActlName', '')).lower()
+        if 'bhavcopy' in name or 'bhav' in file_name or 'security deliverable' in name:
+            score = 0
+            if 'full bhavcopy' in name or 'security deliverable' in name:
+                score += 20
+            if 'bhavcopy (pr)' in name:
+                score += 10
+            if file_name.endswith('.csv'):
+                score += 5
+            if file_name.endswith('.zip'):
+                score += 3
+            if 'full bhavcopy' in name:
+                score += 2
+            candidates.append((score, item))
+    if not candidates:
+        return None
+    return max(candidates, key=lambda x: x[0])[1]
+
+
+def download_and_parse_bhavcopy_for_report_item(item: Dict[str, Any], session: Optional[requests.Session] = None) -> Dict[str, float]:
+    """Download bhavcopy/meta file from NSE reports metadata and parse it into a delivery map."""
+    session = session or prepare_nse_reports_session()
+    file_path = item.get('filePath')
+    file_name = item.get('fileActlName')
+    if not file_path or not file_name:
+        return {}
+    download_url = f"{file_path}{file_name}"
+    try:
+        resp = session.get(download_url, timeout=30)
+        resp.raise_for_status()
+        content = resp.content
+        # Direct CSV file
+        if file_name.lower().endswith('.csv'):
+            return parse_bhavcopy_csv_bytes(content)
+        # ZIP wrapper around CSV
+        if file_name.lower().endswith('.zip'):
+            z = zipfile.ZipFile(io.BytesIO(content))
+            for name in z.namelist():
+                if name.lower().endswith('.csv'):
+                    with z.open(name) as fh:
+                        return parse_bhavcopy_csv_bytes(fh.read())
+            return {}
+        # unsupported file type
+        return {}
+    except Exception as e:
+        print(f"Warning: failed to download/parse bhavcopy report item {download_url}: {e}")
+        return {}
+
+
+def parse_bhavcopy_csv_bytes(content: bytes) -> Dict[str, float]:
+    """Parse CSV bytes and return a symbol->delivery% map."""
+    try:
+        df = pd.read_csv(io.BytesIO(content))
+    except Exception:
+        return {}
+    # Normalize columns
+    cols = {c.strip().upper(): c for c in df.columns}
+    sym_col = None
+    tot_col = None
+    deliv_col = None
+    per_col = None
+    for c in df.columns:
+        uc = c.strip().upper()
+        if uc == 'SYMBOL':
+            sym_col = c
+        if uc in ('TTL_TRD_QNTY', 'TTL_TRD_QTY', 'TTLTRDQTY', 'TOTTRDQTY', 'TOTALTRDQTY', 'TOTAL_TRDQTY'):
+            tot_col = c
+        if uc in ('DELIV_QTY', 'DELIVQTY', 'DELIVERABLE_QTY', 'DELIVERABLEQTY'):
+            deliv_col = c
+        if uc in ('DELIV_PER', 'DELIVPER', 'DELIVERY_PERCENT', 'DELIVERY_PCT', 'DELIVERY_PERCENTAGE', 'DELIV_PCT'):
+            per_col = c
+    if sym_col is None or ((tot_col is None or deliv_col is None) and per_col is None):
+        for c in df.columns:
+            uc = c.strip().upper()
+            if 'SYMBOL' in uc and sym_col is None:
+                sym_col = c
+            if ('TOT' in uc or 'TTL' in uc) and 'QTY' in uc and tot_col is None:
+                tot_col = c
+            if 'DELIV' in uc and 'QTY' in uc and deliv_col is None:
+                deliv_col = c
+            if ('DELIV' in uc or 'DELIVERY' in uc) and ('PER' in uc or 'PCT' in uc) and per_col is None:
+                per_col = c
+    if sym_col is None or ((tot_col is None or deliv_col is None) and per_col is None):
+        return {}
+    result = {}
+    for _, row in df.iterrows():
+        try:
+            sym = str(row[sym_col]).strip().upper()
+            if per_col is not None and not pd.isna(row[per_col]):
+                result[sym] = float(row[per_col])
+                continue
+            tot = int(float(row[tot_col])) if tot_col is not None and not pd.isna(row[tot_col]) else 0
+            deliv = int(float(row[deliv_col])) if deliv_col is not None and not pd.isna(row[deliv_col]) else 0
+            if tot > 0:
+                result[sym] = (deliv / tot) * 100.0
+        except Exception:
+            continue
+    return result
+
+
+def fetch_bhavcopy_map(preferred_date: Optional[str] = None) -> Dict[str, float]:
+    """Attempt to fetch bhavcopy mapping for preferred_date (YYYY-MM-DD) or recent previous trading days.
+
+    Preference order:
+      1. If `preferred_date` provided and valid, try it.
+      2. Try today.
+      3. Walk back business days (skip weekends) up to `max_lookback_days`.
+
+    Returns first successful symbol->delivery% map or empty dict.
+    """
+    max_lookback_days = 10
+    dates_to_try = []
+    # 1) preferred date if provided
+    if preferred_date:
+        try:
+            d0 = datetime.fromisoformat(preferred_date)
+            dates_to_try.append(d0)
+        except Exception:
+            pass
+
+    # 2) today and previous business days
+    today = datetime.now()
+    d = today
+    looked = 0
+    while looked < max_lookback_days:
+        # skip weekends
+        if d.weekday() < 5:
+            dates_to_try.append(d)
+            looked += 1
+        d = d - timedelta(days=1)
+
+    tried = set()
+    session = prepare_nse_reports_session()
+    for d in dates_to_try:
+        key = d.strftime('%Y-%m-%d')
+        if key in tried:
+            continue
+        tried.add(key)
+        # First try the reports API path (same flow as the NSE download page)
+        metadata = fetch_daily_reports_metadata('CM', session=session)
+        item = choose_bhavcopy_report_item(metadata, d)
+        if item:
+            parsed = download_and_parse_bhavcopy_for_report_item(item, session=session)
+            if parsed:
+                print(f"Loaded bhavcopy from NSE reports API for {d.date()} with {len(parsed)} entries")
+                return parsed
+        # Fallback to historic archive path for older-style bhavcopy files
+        m = download_and_parse_bhavcopy_for_date(d)
+        if m:
+            print(f"Loaded bhavcopy from archive path for {d.date()} with {len(m)} entries")
+            return m
+    print('Bhavcopy is empty')
+    return {}
 
 
 def build_report(results: List[Dict[str, Any]]) -> str:
@@ -218,6 +510,9 @@ def build_report(results: List[Dict[str, Any]]) -> str:
             f"<td>{r['sma20']:.2f}</td><td>{r['sma50']:.2f}</td>"
             f"<td>{delivery_display}</td><td>{int(r['volume']):,}</td></tr>"
         )
+    # If no rows, include a placeholder row so email clients show something useful
+    if not rows:
+        rows = ["<tr><td colspan=6 style='text-align:center'>No matching stocks found for this run.</td></tr>"]
     html = """
     <html>
     <body>
@@ -374,6 +669,16 @@ def scan_universe():
     delivery_below = 0
     passed_delivery = 0
 
+    bhav_map = {}
+    if USE_BHAVCOPY:
+        # Infer bhavcopy date from yfinance if not provided
+        bhav_date = BHAVCOPY_DATE
+        if not bhav_date:
+            bhav_date = determine_bhavcopy_date_from_yfinance(tickers)
+            if bhav_date:
+                print(f'Inferred bhavcopy date from yfinance: {bhav_date}')
+        bhav_map = fetch_bhavcopy_map(bhav_date)
+
     for i, t in enumerate(tickers):
         total_scanned += 1
         # To keep GitHub Action runtime manageable, limit CPU/time per run by sampling
@@ -402,11 +707,21 @@ def scan_universe():
                 'sma20': sma20,
                 'sma50': sma50,
                 'delivery_pct': None,
+                'delivery_source': None,
                 'volume': volume,
             })
             continue
 
-        delivery_pct = fetch_delivery_percentage_nse(t)
+        # Try bhavcopy first when available
+        delivery_pct = None
+        delivery_source = None
+        if bhav_map and t.upper() in bhav_map:
+            delivery_pct = float(bhav_map[t.upper()])
+            delivery_source = 'bhavcopy'
+        else:
+            delivery_pct = fetch_delivery_percentage_nse(t)
+            if delivery_pct is not None:
+                delivery_source = 'nse_json'
         if delivery_pct is None:
             delivery_missing += 1
             continue
@@ -422,6 +737,7 @@ def scan_universe():
             'sma20': sma20,
             'sma50': sma50,
             'delivery_pct': delivery_pct,
+            'delivery_source': delivery_source,
             'volume': volume,
         })
 
@@ -452,6 +768,7 @@ def scan_universe():
         print('No matching stocks found for the current scan.')
 
     # Build HTML report and send
+    print(f"Building report with {len(top)} rows")
     report_html = build_report(top)
     send_notification(report_html)
 

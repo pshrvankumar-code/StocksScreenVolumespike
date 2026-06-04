@@ -1,6 +1,150 @@
 [
   {
-    "date": "2026-06-04T15:09:43.972313+00:00",
+    "date": "2026-06-04T17:03:46.862678+00:00",
+    "results": [
+      {
+        "ticker": "KOTAKBANK",
+        "price": 381.5,
+        "sma20": 383.4875,
+        "sma50": 376.9359985351563,
+        "delivery_pct": 64.06,
+        "delivery_source": "bhavcopy",
+        "volume": 13888450
+      },
+      {
+        "ticker": "HINDUNILVR",
+        "price": 2079.39990234375,
+        "sma20": 2201.4149780273438,
+        "sma50": 2202.3759912109376,
+        "delivery_pct": 62.63,
+        "delivery_source": "bhavcopy",
+        "volume": 2142295
+      },
+      {
+        "ticker": "INFY",
+        "price": 1201.300048828125,
+        "sma20": 1171.825,
+        "sma50": 1220.0579956054687,
+        "delivery_pct": 57.33,
+        "delivery_source": "bhavcopy",
+        "volume": 12754428
+      },
+      {
+        "ticker": "RELIANCE",
+        "price": 1303.699951171875,
+        "sma20": 1348.189990234375,
+        "sma50": 1364.1080004882813,
+        "delivery_pct": 54.3,
+        "delivery_source": "bhavcopy",
+        "volume": 23455147
+      },
+      {
+        "ticker": "HDFCBANK",
+        "price": 754.2000122070312,
+        "sma20": 761.227505493164,
+        "sma50": 773.58400390625,
+        "delivery_pct": 52.97,
+        "delivery_source": "bhavcopy",
+        "volume": 42667891
+      },
+      {
+        "ticker": "BHARTIARTL",
+        "price": 1818.9000244140625,
+        "sma20": 1848.2650024414063,
+        "sma50": 1840.5840014648438,
+        "delivery_pct": 52.68,
+        "delivery_source": "bhavcopy",
+        "volume": 6735112
+      },
+      {
+        "ticker": "SBIN",
+        "price": 979.25,
+        "sma20": 965.9225006103516,
+        "sma50": 1025.0630004882812,
+        "delivery_pct": 51.31,
+        "delivery_source": "bhavcopy",
+        "volume": 18872486
+      }
+    ]
+  },
+  {
+    "date": "2026-06-04T17:02:38.330646+00:00",
+    "results": [
+      {
+        "ticker": "KOTAKBANK",
+        "price": 381.5,
+        "sma20": 383.4875,
+        "sma50": 376.9359985351563,
+        "delivery_pct": 64.06,
+        "delivery_source": "bhavcopy",
+        "volume": 13888450
+      },
+      {
+        "ticker": "HINDUNILVR",
+        "price": 2079.39990234375,
+        "sma20": 2201.4149780273438,
+        "sma50": 2202.3759912109376,
+        "delivery_pct": 62.63,
+        "delivery_source": "bhavcopy",
+        "volume": 2142295
+      },
+      {
+        "ticker": "INFY",
+        "price": 1201.300048828125,
+        "sma20": 1171.825,
+        "sma50": 1220.0579956054687,
+        "delivery_pct": 57.33,
+        "delivery_source": "bhavcopy",
+        "volume": 12754428
+      },
+      {
+        "ticker": "RELIANCE",
+        "price": 1303.699951171875,
+        "sma20": 1348.189990234375,
+        "sma50": 1364.1080004882813,
+        "delivery_pct": 54.3,
+        "delivery_source": "bhavcopy",
+        "volume": 23455147
+      },
+      {
+        "ticker": "HDFCBANK",
+        "price": 754.2000122070312,
+        "sma20": 761.227505493164,
+        "sma50": 773.58400390625,
+        "delivery_pct": 52.97,
+        "delivery_source": "bhavcopy",
+        "volume": 42667891
+      },
+      {
+        "ticker": "BHARTIARTL",
+        "price": 1818.9000244140625,
+        "sma20": 1848.2650024414063,
+        "sma50": 1840.5840014648438,
+        "delivery_pct": 52.68,
+        "delivery_source": "bhavcopy",
+        "volume": 6735112
+      },
+      {
+        "ticker": "SBIN",
+        "price": 979.25,
+        "sma20": 965.9225006103516,
+        "sma50": 1025.0630004882812,
+        "delivery_pct": 51.31,
+        "delivery_source": "bhavcopy",
+        "volume": 18872486
+      }
+    ]
+  },
+  {
+    "date": "2026-06-04T17:00:08.433610+00:00",
+    "results": []
+  },
+  {
+    "date": "2026-06-04T16:41:11.263587+00:00",
+    "results": []
+  },
+  {
+    "date": "2026-06-04T16:31:11.662031+00:00",
     "results": [
       {
         "ticker": "RELIANCE",
@@ -8,6 +152,7 @@
         "sma20": 1348.189990234375,
         "sma50": 1364.1080004882813,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 23455147
       },
       {
@@ -16,6 +161,7 @@
         "sma20": 2304.5649658203124,
         "sma50": 2407.7699755859376,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 4865423
       },
       {
@@ -24,6 +170,7 @@
         "sma20": 761.227505493164,
         "sma50": 773.58400390625,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 42667891
       },
       {
@@ -32,6 +179,7 @@
         "sma20": 1171.825,
         "sma50": 1220.0579956054687,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 12754428
       },
       {
@@ -40,6 +188,7 @@
         "sma20": 1253.3300048828125,
         "sma50": 1274.602001953125,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 19459241
       },
       {
@@ -48,6 +197,7 @@
         "sma20": 2201.4149780273438,
         "sma50": 2202.3759912109376,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 2142295
       },
       {
@@ -56,6 +206,7 @@
         "sma20": 383.4875,
         "sma50": 376.9359985351563,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 13888450
       },
       {
@@ -64,6 +215,7 @@
         "sma20": 965.9225006103516,
         "sma50": 1025.0630004882812,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 18872486
       },
       {
@@ -72,6 +224,7 @@
         "sma20": 1848.2650024414063,
         "sma50": 1840.5840014648438,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 6735112
       },
       {
@@ -80,12 +233,17 @@
         "sma20": 3964.5349975585937,
         "sma50": 3925.312001953125,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 1398097
       }
     ]
   },
   {
-    "date": "2026-06-04T15:06:25.455331+00:00",
+    "date": "2026-06-04T16:30:57.781170+00:00",
+    "results": []
+  },
+  {
+    "date": "2026-06-04T16:22:30.473083+00:00",
     "results": [
       {
         "ticker": "RELIANCE",
@@ -93,6 +251,7 @@
         "sma20": 1348.189990234375,
         "sma50": 1364.1080004882813,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 23455147
       },
       {
@@ -101,6 +260,7 @@
         "sma20": 2304.5649658203124,
         "sma50": 2407.7699755859376,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 4865423
       },
       {
@@ -109,6 +269,7 @@
         "sma20": 761.227505493164,
         "sma50": 773.58400390625,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 42667891
       },
       {
@@ -117,6 +278,7 @@
         "sma20": 1171.825,
         "sma50": 1220.0579956054687,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 12754428
       },
       {
@@ -125,6 +287,7 @@
         "sma20": 1253.3300048828125,
         "sma50": 1274.602001953125,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 19459241
       },
       {
@@ -133,6 +296,7 @@
         "sma20": 2201.4149780273438,
         "sma50": 2202.3759912109376,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 2142295
       },
       {
@@ -141,6 +305,7 @@
         "sma20": 383.4875,
         "sma50": 376.9359985351563,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 13888450
       },
       {
@@ -149,6 +314,7 @@
         "sma20": 965.9225006103516,
         "sma50": 1025.0630004882812,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 18872486
       },
       {
@@ -157,6 +323,7 @@
         "sma20": 1848.2650024414063,
         "sma50": 1840.5840014648438,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 6735112
       },
       {
@@ -165,12 +332,21 @@
         "sma20": 3964.5349975585937,
         "sma50": 3925.312001953125,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 1398097
       }
     ]
   },
   {
-    "date": "2026-06-04T15:05:31.885624+00:00",
+    "date": "2026-06-04T16:22:15.976960+00:00",
+    "results": []
+  },
+  {
+    "date": "2026-06-04T15:39:09.943826+00:00",
+    "results": []
+  },
+  {
+    "date": "2026-06-04T15:27:59.979141+00:00",
     "results": [
       {
         "ticker": "RELIANCE",
@@ -178,6 +354,7 @@
         "sma20": 1348.189990234375,
         "sma50": 1364.1080004882813,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 23455147
       },
       {
@@ -186,6 +363,7 @@
         "sma20": 2304.5649658203124,
         "sma50": 2407.7699755859376,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 4865423
       },
       {
@@ -194,6 +372,7 @@
         "sma20": 761.227505493164,
         "sma50": 773.58400390625,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 42667891
       },
       {
@@ -202,6 +381,7 @@
         "sma20": 1171.825,
         "sma50": 1220.0579956054687,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 12754428
       },
       {
@@ -210,6 +390,7 @@
         "sma20": 1253.3300048828125,
         "sma50": 1274.602001953125,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 19459241
       },
       {
@@ -218,6 +399,7 @@
         "sma20": 2201.4149780273438,
         "sma50": 2202.3759912109376,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 2142295
       },
       {
@@ -226,6 +408,7 @@
         "sma20": 383.4875,
         "sma50": 376.9359985351563,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 13888450
       },
       {
@@ -234,6 +417,7 @@
         "sma20": 965.9225006103516,
         "sma50": 1025.0630004882812,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 18872486
       },
       {
@@ -242,6 +426,7 @@
         "sma20": 1848.2650024414063,
         "sma50": 1840.5840014648438,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 6735112
       },
       {
@@ -250,36 +435,8 @@
         "sma20": 3964.5349975585937,
         "sma50": 3925.312001953125,
         "delivery_pct": null,
+        "delivery_source": null,
         "volume": 1398097
-      }
-    ]
-  },
-  {
-    "date": "2026-06-04T11:32:08.120616+00:00",
-    "results": [
-      {
-        "ticker": "HDFCBANK",
-        "price": 754.2000122070312,
-        "sma20": 761.227505493164,
-        "sma50": 773.58400390625,
-        "delivery_pct": 73.95673427223505,
-        "volume": 42667891
-      },
-      {
-        "ticker": "ICICIBANK",
-        "price": 1251.699951171875,
-        "sma20": 1253.3300048828125,
-        "sma50": 1274.602001953125,
-        "delivery_pct": 57.856617692520686,
-        "volume": 19459241
-      },
-      {
-        "ticker": "INFY",
-        "price": 1201.300048828125,
-        "sma20": 1171.825,
-        "sma50": 1220.0579956054687,
-        "delivery_pct": 53.0315417068931,
-        "volume": 12754428
       }
     ]
   }
