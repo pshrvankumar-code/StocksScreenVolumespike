@@ -229,8 +229,17 @@ def send_notification(report_html: str):
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
 
-    SMTP_SERVER = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')
-    SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
+    SMTP_SERVER = os.environ.get('SMTP_SERVER') or 'smtp.gmail.com'
+    # Parse SMTP_PORT safely: allow empty string or missing secret
+    smtp_port_raw = os.environ.get('SMTP_PORT')
+    try:
+        if smtp_port_raw is None or str(smtp_port_raw).strip() == '':
+            SMTP_PORT = 587
+        else:
+            SMTP_PORT = int(smtp_port_raw)
+    except Exception:
+        print(f"Warning: invalid SMTP_PORT='{smtp_port_raw}', falling back to 587")
+        SMTP_PORT = 587
     SENDER_EMAIL = os.environ.get('SENDER_EMAIL')
     SENDER_PASSWORD = os.environ.get('SENDER_PASSWORD')
     RECEIVER_EMAIL = os.environ.get('RECEIVER_EMAIL')
