@@ -370,7 +370,6 @@ def scan_universe():
 
     candidates = []
     total_scanned = 0
-    passed_support = 0
     delivery_missing = 0
     delivery_below = 0
     passed_delivery = 0
@@ -390,14 +389,8 @@ def scan_universe():
         sma50 = float(latest['SMA50']) if not pd.isna(latest['SMA50']) else float('nan')
         volume = int(latest['Volume']) if not pd.isna(latest['Volume']) else 0
 
-        # Support zone check
-        in_zone = (
-            is_in_support_zone(price, sma20, SMA_PROXIMITY_PCT)
-            or is_in_support_zone(price, sma50, SMA_PROXIMITY_PCT)
-        )
-        if not in_zone:
-            continue
-        passed_support += 1
+        # NOTE: Support zone filter removed as requested. We now evaluate all tickers
+        # for delivery breakout (or include all when DELIVERY_CHECK_ENABLED=0).
 
         # Delivery check (may be skipped via env)
         if not DELIVERY_CHECK_ENABLED:
@@ -439,7 +432,6 @@ def scan_universe():
 
     # Print diagnostic summary to console so the workflow output is visible
     print(f"Total tickers scanned: {total_scanned}")
-    print(f"Passed support zone: {passed_support}")
     print(f"Delivery data missing/skipped: {delivery_missing}")
     print(f"Delivery below threshold: {delivery_below}")
     print(f"Passed delivery filter: {passed_delivery}")
@@ -448,9 +440,12 @@ def scan_universe():
     if top:
         print(f"Top {len(top)} results:")
         for item in top:
+            delivery_display = (
+                f"{item['delivery_pct']:.1f}%" if isinstance(item.get('delivery_pct'), (int, float)) else 'N/A'
+            )
             print(
-                f"{item['ticker']}: price={item['price']:.2f}, SMA20={item['sma20']:.2f}, "
-                f"SMA50={item['sma50']:.2f}, delivery={item['delivery_pct']:.1f}%, "
+                f"  {item['ticker']}: price={item['price']:.2f}, SMA20={item['sma20']:.2f}, "
+                f"SMA50={item['sma50']:.2f}, delivery={delivery_display}, "
                 f"volume={item['volume']:,}"
             )
     else:
