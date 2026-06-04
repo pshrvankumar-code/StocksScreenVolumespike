@@ -48,6 +48,10 @@ NSE_NIFTY500_CSV = (
     "https://archives.nseindia.com/content/indices/ind_nifty500list.csv"
 )
 
+# Allow disabling delivery % check via environment for cases when NSE API is rate-limiting or blocked
+# Set environment variable DELIVERY_CHECK_ENABLED=0 to skip delivery checks and only use SMA support filter
+DELIVERY_CHECK_ENABLED = str(os.environ.get('DELIVERY_CHECK_ENABLED', '1')).lower() in ('1', 'true', 'yes')
+
 # ----------------------- Helper Functions -----------------------
 
 def get_nifty500_tickers() -> List[str]:
@@ -118,8 +122,7 @@ def fetch_delivery_percentage_nse(ticker: str) -> Optional[float]:
     then calls the JSON API that powers the NSE equity quote pages.
 
     Returns delivery percentage as float (0-100), or None if not available.
-    Note: NSE public API endpoints may change or rate-limit; consider
-    using an exchange data provider for production usage.
+    This version includes basic retries and sanitization of returned values.
     """
     symbol = ticker.upper()
     base = 'https://www.nseindia.com'
@@ -129,74 +132,91 @@ def fetch_delivery_percentage_nse(ticker: str) -> Optional[float]:
         'Accept-Language': 'en-US,en;q=0.9',
         'Accept': 'application/json, text/plain, */*',
     }
-    try:
-        session = requests.Session()
-        # Initial GET to set cookies
-        session.get(base, headers=headers, timeout=10)
-        resp = session.get(api_url, headers=headers, timeout=10)
-        resp.raise_for_status()
-        data = resp.json()
-        # Try a few common paths that may contain delivery info
-        keys = [
-            ('deliveryToTradedVolume',),
-            ('data', 'deliveryToTradedVolume'),
-            ('records', 'deliveryToTradedVolume')
-        ]
-        # Flatten search across nested dicts
-        def deep_get(d, path):
-            obj = d
-            for k in path:
-                if isinstance(obj, dict) and k in obj:
-                    obj = obj[k]
-                else:
-                    return None
-            return obj
 
-        for path in keys:
-            val = deep_get(data, path)
-            if val is not None:
-                try:
-                    # API sometimes returns string like '12.34' or a number
-                    return float(val)
-                except Exception:
-                    continue
-
-        # Other possible locations: inspect 'priceInfo' or nested payloads
-        # Search entire JSON for keys containing 'delivery' as fallback
-        def find_delivery(node):
-            if isinstance(node, dict):
-                for k, v in node.items():
-                    if 'delivery' in k.lower():
-                        try:
-                            return float(v)
-                        except Exception:
-                            pass
-                    res = find_delivery(v)
-                    if res is not None:
-                        return res
-            elif isinstance(node, list):
-                for item in node:
-                    res = find_delivery(item)
-                    if res is not None:
-                        return res
+    def sanitize_value(val) -> Optional[float]:
+        try:
+            if val is None:
+                return None
+            s = str(val).strip()
+            # remove percent signs and commas
+            s = s.replace('%', '').replace(',', '')
+            # if empty after stripping
+            if s == '':
+                return None
+            f = float(s)
+            # crude validation
+            if f < 0 or f > 1000:
+                return None
+            # If the API sometimes gives ratio like 0.6 instead of percent, handle that
+            if f <= 1:
+                f = f * 100
+            return f
+        except Exception:
             return None
 
-        found = find_delivery(data)
-        if found is not None:
-            return float(found)
-        return None
-    except Exception:
-        return None
+    # Try a couple of times to avoid transient NSE rate limits
+    for attempt in range(2):
+        try:
+            session = requests.Session()
+            session.get(base, headers=headers, timeout=10)
+            resp = session.get(api_url, headers=headers, timeout=10)
+            resp.raise_for_status()
+            data = resp.json()
+
+            # Try explicit locations first
+            candidates = []
+            # direct possible keys
+            for key in ['deliveryToTradedVolume', 'deliverytoTradedVolume', 'delivery']:
+                if key in data:
+                    candidates.append(data[key])
+            # common nested places
+            if isinstance(data, dict):
+                if 'data' in data and isinstance(data['data'], dict) and 'deliveryToTradedVolume' in data['data']:
+                    candidates.append(data['data']['deliveryToTradedVolume'])
+                if 'records' in data and isinstance(data['records'], dict) and 'deliveryToTradedVolume' in data['records']:
+                    candidates.append(data['records']['deliveryToTradedVolume'])
+
+            # recursive search for keys containing 'delivery'
+            def find_delivery(node):
+                if isinstance(node, dict):
+                    for k, v in node.items():
+                        if 'delivery' in k.lower():
+                            candidates.append(v)
+                        else:
+                            find_delivery(v)
+                elif isinstance(node, list):
+                    for item in node:
+                        find_delivery(item)
+
+            find_delivery(data)
+
+            # sanitize candidates
+            for c in candidates:
+                val = sanitize_value(c)
+                if val is not None:
+                    if 0 <= val <= 100:
+                        return val
+            # nothing found this attempt
+        except Exception as e:
+            # transient error, retry
+            # print minimal debug to help CI logs
+            print(f"Warning: delivery fetch attempt {attempt+1} failed for {ticker}: {str(e)[:120]}")
+            time.sleep(1)
+            continue
+    return None
 
 
 def build_report(results: List[Dict[str, Any]]) -> str:
     """Build an HTML table report from the results list."""
     rows = []
     for r in results:
+        delivery_display = (
+            f"{r['delivery_pct']:.1f}" if isinstance(r.get('delivery_pct'), (int, float)) else 'N/A'
+        )
         rows.append(
             f"<tr><td>{r['ticker']}</td><td>{r['price']:.2f}</td>"
             f"<td>{r['sma20']:.2f}</td><td>{r['sma50']:.2f}</td>"
-            f"<td>{r['delivery_pct']:.1f}</td><td>{int(r['volume']):,}</td></tr>"
+            f"<td>{delivery_display}</td><td>{int(r['volume']):,}</td></tr>"
         )
     html = """
     <html>
@@ -349,7 +369,14 @@ def scan_universe():
     print(f'Found {len(tickers)} tickers to scan (limiting tests in debug).')
 
     candidates = []
+    total_scanned = 0
+    passed_support = 0
+    delivery_missing = 0
+    delivery_below = 0
+    passed_delivery = 0
+
     for i, t in enumerate(tickers):
+        total_scanned += 1
         # To keep GitHub Action runtime manageable, limit CPU/time per run by sampling
         if i and i % 100 == 0:
             print(f'Scanned {i} tickers...')
@@ -370,14 +397,32 @@ def scan_universe():
         )
         if not in_zone:
             continue
+        passed_support += 1
 
-        # Fetch delivery percentage from NSE (may be None)
+        # Delivery check (may be skipped via env)
+        if not DELIVERY_CHECK_ENABLED:
+            # Skipping delivery check; include candidate with delivery_pct=None
+            passed_delivery += 1
+            candidates.append({
+                'ticker': t,
+                'price': price,
+                'sma20': sma20,
+                'sma50': sma50,
+                'delivery_pct': None,
+                'volume': volume,
+            })
+            continue
+
         delivery_pct = fetch_delivery_percentage_nse(t)
         if delivery_pct is None:
+            delivery_missing += 1
             continue
+        # accept only if delivery percent >= threshold
         if delivery_pct < DELIVERY_PCT_THRESHOLD:
+            delivery_below += 1
             continue
 
+        passed_delivery += 1
         candidates.append({
             'ticker': t,
             'price': price,
@@ -388,8 +433,28 @@ def scan_universe():
         })
 
     # Sort by highest delivery % and limit results
-    candidates.sort(key=lambda x: x['delivery_pct'], reverse=True)
+    # Use -1 for missing delivery_pct so None values do not break sorting
+    candidates.sort(key=lambda x: x['delivery_pct'] if x['delivery_pct'] is not None else -1, reverse=True)
     top = candidates[:MAX_STOCKS_TO_REPORT]
+
+    # Print diagnostic summary to console so the workflow output is visible
+    print(f"Total tickers scanned: {total_scanned}")
+    print(f"Passed support zone: {passed_support}")
+    print(f"Delivery data missing/skipped: {delivery_missing}")
+    print(f"Delivery below threshold: {delivery_below}")
+    print(f"Passed delivery filter: {passed_delivery}")
+    print(f"Found {len(candidates)} matching stocks after filters.")
+
+    if top:
+        print(f"Top {len(top)} results:")
+        for item in top:
+            print(
+                f"{item['ticker']}: price={item['price']:.2f}, SMA20={item['sma20']:.2f}, "
+                f"SMA50={item['sma50']:.2f}, delivery={item['delivery_pct']:.1f}%, "
+                f"volume={item['volume']:,}"
+            )
+    else:
+        print('No matching stocks found for the current scan.')
 
     # Build HTML report and send
     report_html = build_report(top)
