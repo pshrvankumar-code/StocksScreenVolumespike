@@ -4,7 +4,17 @@ A production-ready Python automation tool and GitHub Actions workflow for scanni
 
 ## Overview
 
-This screener identifies stocks consolidating near 20/50-day moving averages with delivery percentages ≥50%, similar to the Jindal Saw historical breakout pattern. It automates daily scans, emails results, and maintains a rolling 10-day history log.
+This screener identifies high-delivery Nifty 500 stocks using moving averages and delivery volume data. It automates daily scans, emails results, and maintains a rolling 10-day history log.
+
+### Current Screening Logic
+
+- Scan the Nifty 500 ticker universe.
+- Fetch recent OHLCV price data and compute 20-day and 50-day SMAs.
+- Load delivery percentage from bhavcopy when available, with NSE reports API metadata as the preferred source.
+- Fall back to NSE JSON delivery data when bhavcopy is not available.
+- Skip any tickers with missing delivery data when delivery filtering is enabled.
+- Require delivery percentage above the configured threshold (`DELIVERY_PCT_THRESHOLD`).
+- Sort candidates by delivery percentage descending and keep the top configured results (`MAX_STOCKS_TO_REPORT`).
 
 ### Key Features
 
