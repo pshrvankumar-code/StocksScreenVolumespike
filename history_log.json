@@ -1,5 +1,55 @@
 [
   {
+    "date": "2026-06-17T14:26:50.355800+00:00",
+    "results": [
+      {
+        "ticker": "KOTAKBANK",
+        "price": 404.5,
+        "sma20": 388.30750274658203,
+        "sma50": 382.68599975585937,
+        "delivery_pct": 69.85,
+        "delivery_source": "bhavcopy",
+        "volume": 11653859
+      },
+      {
+        "ticker": "BHARTIARTL",
+        "price": 1875.699951171875,
+        "sma20": 1832.014990234375,
+        "sma50": 1842.7199951171874,
+        "delivery_pct": 59.4,
+        "delivery_source": "bhavcopy",
+        "volume": 7653406
+      },
+      {
+        "ticker": "LT",
+        "price": 4207.7001953125,
+        "sma20": 4006.3400024414063,
+        "sma50": 4002.78599609375,
+        "delivery_pct": 52.94,
+        "delivery_source": "bhavcopy",
+        "volume": 1312629
+      },
+      {
+        "ticker": "SBIN",
+        "price": 1026.5,
+        "sma20": 982.2375030517578,
+        "sma50": 1021.5539990234375,
+        "delivery_pct": 51.19,
+        "delivery_source": "bhavcopy",
+        "volume": 8188543
+      },
+      {
+        "ticker": "HINDUNILVR",
+        "price": 2197.60009765625,
+        "sma20": 2154.1450073242186,
+        "sma50": 2215.757998046875,
+        "delivery_pct": 51.14,
+        "delivery_source": "bhavcopy",
+        "volume": 1511022
+      }
+    ]
+  },
+  {
     "date": "2026-06-16T15:54:10.337581+00:00",
     "results": [
       {
@@ -554,38 +604,6 @@
   },
   {
     "date": "2026-06-05T13:36:23.530984+00:00",
-    "results": [
-      {
-        "ticker": "HINDUNILVR",
-        "price": 2121.5,
-        "sma20": 2193.10498046875,
-        "sma50": 2203.7619921875,
-        "delivery_pct": 70.53,
-        "delivery_source": "bhavcopy",
-        "volume": 1822858
-      },
-      {
-        "ticker": "KOTAKBANK",
-        "price": 377.45001220703125,
-        "sma20": 383.32000122070315,
-        "sma50": 377.3539990234375,
-        "delivery_pct": 63.13,
-        "delivery_source": "bhavcopy",
-        "volume": 10126166
-      },
-      {
-        "ticker": "SBIN",
-        "price": 977.7000122070312,
-        "sma20": 963.8425018310547,
-        "sma50": 1023.9790002441406,
-        "delivery_pct": 51.4,
-        "delivery_source": "bhavcopy",
-        "volume": 20954343
-      }
-    ]
-  },
-  {
-    "date": "2026-06-05T13:23:55.230954+00:00",
     "results": [
       {
         "ticker": "HINDUNILVR",
