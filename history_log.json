@@ -1,5 +1,73 @@
 [
   {
+    "date": "2026-11-17T19:38:18.167888+00:00",
+    "results": [
+      {
+        "ticker": "ICICIBANK",
+        "price": NaN,
+        "sma20": 1459.8526225842927,
+        "sma50": 1396.7306082589287,
+        "delivery_pct": 68.95,
+        "delivery_source": "bhavcopy",
+        "volume": 15279818
+      },
+      {
+        "ticker": "SBIN",
+        "price": NaN,
+        "sma20": 999.1105218184622,
+        "sma50": 985.9377541055485,
+        "delivery_pct": 64.34,
+        "delivery_source": "bhavcopy",
+        "volume": 16307702
+      },
+      {
+        "ticker": "BHARTIARTL",
+        "price": NaN,
+        "sma20": 2008.8105211759869,
+        "sma50": 1892.4326470822705,
+        "delivery_pct": 63.21,
+        "delivery_source": "bhavcopy",
+        "volume": 6982324
+      },
+      {
+        "ticker": "HDFCBANK",
+        "price": NaN,
+        "sma20": 735.9710500616776,
+        "sma50": 723.3102018395249,
+        "delivery_pct": 62.42,
+        "delivery_source": "bhavcopy",
+        "volume": 34908094
+      },
+      {
+        "ticker": "LT",
+        "price": NaN,
+        "sma20": 3909.4000051398025,
+        "sma50": 3847.118368343431,
+        "delivery_pct": 58.8,
+        "delivery_source": "bhavcopy",
+        "volume": 1939756
+      },
+      {
+        "ticker": "KOTAKBANK",
+        "price": NaN,
+        "sma20": 461.1157885099712,
+        "sma50": 437.221426827567,
+        "delivery_pct": 56.56,
+        "delivery_source": "bhavcopy",
+        "volume": 15625466
+      },
+      {
+        "ticker": "HINDUNILVR",
+        "price": NaN,
+        "sma20": 1911.5842156661183,
+        "sma50": 1911.2040841238838,
+        "delivery_pct": 54.82,
+        "delivery_source": "bhavcopy",
+        "volume": 1103860
+      }
+    ]
+  },
+  {
     "date": "2026-11-16T20:49:13.436985+00:00",
     "results": [
       {
@@ -579,92 +647,6 @@
         "delivery_pct": 53.07,
         "delivery_source": "bhavcopy",
         "volume": 3140927
-      }
-    ]
-  },
-  {
-    "date": "2026-11-03T18:14:43.406897+00:00",
-    "results": [
-      {
-        "ticker": "BHARTIARTL",
-        "price": 2065.0,
-        "sma20": 1889.5999877929687,
-        "sma50": 1860.0719946289062,
-        "delivery_pct": 71.79,
-        "delivery_source": "bhavcopy",
-        "volume": 18602031
-      },
-      {
-        "ticker": "KOTAKBANK",
-        "price": 464.6499938964844,
-        "sma20": 443.9074981689453,
-        "sma50": 426.3089990234375,
-        "delivery_pct": 68.82,
-        "delivery_source": "bhavcopy",
-        "volume": 18520882
-      },
-      {
-        "ticker": "ICICIBANK",
-        "price": 1424.5,
-        "sma20": 1377.6099975585937,
-        "sma50": 1377.9459985351561,
-        "delivery_pct": 65.98,
-        "delivery_source": "bhavcopy",
-        "volume": 17496481
-      },
-      {
-        "ticker": "INFY",
-        "price": 1148.0999755859375,
-        "sma20": 1108.3074951171875,
-        "sma50": 1086.4610009765624,
-        "delivery_pct": 59.44,
-        "delivery_source": "bhavcopy",
-        "volume": 10494010
-      },
-      {
-        "ticker": "RELIANCE",
-        "price": 1307.9000244140625,
-        "sma20": 1199.104998779297,
-        "sma50": 1235.5580004882813,
-        "delivery_pct": 55.7,
-        "delivery_source": "bhavcopy",
-        "volume": 42318217
-      },
-      {
-        "ticker": "HDFCBANK",
-        "price": 725.5,
-        "sma20": 702.9974975585938,
-        "sma50": 711.6669982910156,
-        "delivery_pct": 55.4,
-        "delivery_source": "bhavcopy",
-        "volume": 42738372
-      },
-      {
-        "ticker": "LT",
-        "price": 3948.199951171875,
-        "sma20": 3716.5000122070314,
-        "sma50": 3839.512001953125,
-        "delivery_pct": 54.67,
-        "delivery_source": "bhavcopy",
-        "volume": 2152853
-      },
-      {
-        "ticker": "TCS",
-        "price": 2499.10009765625,
-        "sma20": 2371.3299926757813,
-        "sma50": 2272.366003417969,
-        "delivery_pct": 53.4,
-        "delivery_source": "bhavcopy",
-        "volume": 3485800
-      },
-      {
-        "ticker": "SBIN",
-        "price": 970.25,
-        "sma20": 960.317495727539,
-        "sma50": 986.8169995117188,
-        "delivery_pct": 53.1,
-        "delivery_source": "bhavcopy",
-        "volume": 27953749
       }
     ]
   }
