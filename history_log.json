@@ -1,5 +1,82 @@
 [
   {
+    "date": "2026-11-23T22:27:41.360424+00:00",
+    "results": [
+      {
+        "ticker": "BHARTIARTL",
+        "price": NaN,
+        "sma20": 2062.600001284951,
+        "sma50": 1916.2897899394134,
+        "delivery_pct": 69.02,
+        "delivery_source": "bhavcopy",
+        "volume": 5699820
+      },
+      {
+        "ticker": "ICICIBANK",
+        "price": NaN,
+        "sma20": 1506.705258018092,
+        "sma50": 1412.4204051737884,
+        "delivery_pct": 65.67,
+        "delivery_source": "bhavcopy",
+        "volume": 22241355
+      },
+      {
+        "ticker": "HINDUNILVR",
+        "price": NaN,
+        "sma20": 1952.8052721525494,
+        "sma50": 1916.3918382294323,
+        "delivery_pct": 64.29,
+        "delivery_source": "bhavcopy",
+        "volume": 1183006
+      },
+      {
+        "ticker": "HDFCBANK",
+        "price": NaN,
+        "sma20": 761.5026309364721,
+        "sma50": 732.6704064194037,
+        "delivery_pct": 63.2,
+        "delivery_source": "bhavcopy",
+        "volume": 55615279
+      },
+      {
+        "ticker": "KOTAKBANK",
+        "price": NaN,
+        "sma20": 474.9736842105263,
+        "sma50": 443.8316307846381,
+        "delivery_pct": 62.52,
+        "delivery_source": "bhavcopy",
+        "volume": 20537642
+      },
+      {
+        "ticker": "LT",
+        "price": NaN,
+        "sma20": 4022.631591796875,
+        "sma50": 3864.473468391263,
+        "delivery_pct": 59.37,
+        "delivery_source": "bhavcopy",
+        "volume": 1258965
+      },
+      {
+        "ticker": "SBIN",
+        "price": NaN,
+        "sma20": 1035.9210462068256,
+        "sma50": 996.372446488361,
+        "delivery_pct": 50.35,
+        "delivery_source": "bhavcopy",
+        "volume": 14921593
+      },
+      {
+        "ticker": "INFY",
+        "price": NaN,
+        "sma20": 1144.4921039782073,
+        "sma50": 1088.6989771006058,
+        "delivery_pct": 50.13,
+        "delivery_source": "bhavcopy",
+        "volume": 12336744
+      }
+    ]
+  },
+  {
     "date": "2026-11-20T18:58:21.185820+00:00",
     "results": [
       {
@@ -644,10 +721,6 @@
   },
   {
     "date": "2026-11-10T18:32:40.628559+00:00",
-    "results": []
-  },
-  {
-    "date": "2026-11-09T21:21:41.013261+00:00",
     "results": []
   }
 ]
