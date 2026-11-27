@@ -1,5 +1,64 @@
 [
   {
+    "date": "2026-11-27T19:48:42.104505+00:00",
+    "results": [
+      {
+        "ticker": "HDFCBANK",
+        "price": NaN,
+        "sma20": 786.3684210526316,
+        "sma50": 741.585713289222,
+        "delivery_pct": 63.82,
+        "delivery_source": "bhavcopy",
+        "volume": 32944475
+      },
+      {
+        "ticker": "ICICIBANK",
+        "price": NaN,
+        "sma20": 1541.9157843338817,
+        "sma50": 1426.3714250837054,
+        "delivery_pct": 63.49,
+        "delivery_source": "bhavcopy",
+        "volume": 8936852
+      },
+      {
+        "ticker": "KOTAKBANK",
+        "price": NaN,
+        "sma20": 485.4236851742393,
+        "sma50": 449.3877538564254,
+        "delivery_pct": 57.34,
+        "delivery_source": "bhavcopy",
+        "volume": 10621423
+      },
+      {
+        "ticker": "BHARTIARTL",
+        "price": NaN,
+        "sma20": 2089.1315789473683,
+        "sma50": 1933.9163220463968,
+        "delivery_pct": 55.07,
+        "delivery_source": "bhavcopy",
+        "volume": 3626541
+      },
+      {
+        "ticker": "INFY",
+        "price": NaN,
+        "sma20": 1142.6105250308387,
+        "sma50": 1094.9683663504463,
+        "delivery_pct": 54.62,
+        "delivery_source": "bhavcopy",
+        "volume": 10012843
+      },
+      {
+        "ticker": "HINDUNILVR",
+        "price": NaN,
+        "sma20": 1996.9789589329769,
+        "sma50": 1926.1346958705358,
+        "delivery_pct": 51.83,
+        "delivery_source": "bhavcopy",
+        "volume": 2326072
+      }
+    ]
+  },
+  {
     "date": "2026-11-26T19:59:31.343355+00:00",
     "results": [
       {
@@ -689,92 +748,6 @@
         "delivery_pct": 51.3,
         "delivery_source": "bhavcopy",
         "volume": 4851757
-      }
-    ]
-  },
-  {
-    "date": "2026-11-13T18:24:02.367987+00:00",
-    "results": [
-      {
-        "ticker": "KOTAKBANK",
-        "price": 488.54998779296875,
-        "sma20": 458.11749877929685,
-        "sma50": 435.562998046875,
-        "delivery_pct": 71.43,
-        "delivery_source": "bhavcopy",
-        "volume": 11007257
-      },
-      {
-        "ticker": "BHARTIARTL",
-        "price": 2106.0,
-        "sma20": 1988.6449951171876,
-        "sma50": 1886.313994140625,
-        "delivery_pct": 68.51,
-        "delivery_source": "bhavcopy",
-        "volume": 6103603
-      },
-      {
-        "ticker": "SBIN",
-        "price": 1080.0,
-        "sma20": 990.7599945068359,
-        "sma50": 985.5169995117187,
-        "delivery_pct": 66.65,
-        "delivery_source": "bhavcopy",
-        "volume": 15834714
-      },
-      {
-        "ticker": "HDFCBANK",
-        "price": 804.0,
-        "sma20": 731.1324951171875,
-        "sma50": 720.767998046875,
-        "delivery_pct": 65.19,
-        "delivery_source": "bhavcopy",
-        "volume": 23437045
-      },
-      {
-        "ticker": "LT",
-        "price": 4143.7998046875,
-        "sma20": 3869.885009765625,
-        "sma50": 3846.5980029296875,
-        "delivery_pct": 61.87,
-        "delivery_source": "bhavcopy",
-        "volume": 1585316
-      },
-      {
-        "ticker": "ICICIBANK",
-        "price": 1583.5999755859375,
-        "sma20": 1446.9299926757812,
-        "sma50": 1394.38599609375,
-        "delivery_pct": 57.78,
-        "delivery_source": "bhavcopy",
-        "volume": 11438417
-      },
-      {
-        "ticker": "HINDUNILVR",
-        "price": 1992.9000244140625,
-        "sma20": 1905.5350036621094,
-        "sma50": 1912.3700024414063,
-        "delivery_pct": 56.85,
-        "delivery_source": "bhavcopy",
-        "volume": 1268710
-      },
-      {
-        "ticker": "RELIANCE",
-        "price": 1339.699951171875,
-        "sma20": 1249.575,
-        "sma50": 1239.49,
-        "delivery_pct": 53.29,
-        "delivery_source": "bhavcopy",
-        "volume": 13751275
-      },
-      {
-        "ticker": "INFY",
-        "price": 1141.5,
-        "sma20": 1152.4299926757812,
-        "sma50": 1089.9649975585937,
-        "delivery_pct": 51.56,
-        "delivery_source": "bhavcopy",
-        "volume": 5933093
       }
     ]
   }
